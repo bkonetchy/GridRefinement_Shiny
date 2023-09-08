@@ -128,10 +128,10 @@ ui <- fluidPage(
                 #accept = c("text/csv", "text/comma-separated-values, .csv")),
       selectInput(inputId = "example_data", label = "Select Example Dataset", 
                   choices = c("Simple", "Complex")),
-      selectInput(inputId = 'x_coords', label = 'Choose X Coordinate Column', choices = NULL),
-      helpText('Be sure to select the correct column to use'),
-      selectInput(inputId = 'y_coords', label = 'Choose Y Coordinate Column', choices = NULL),
-      helpText('Be sure to select the correct column to use'),
+      #selectInput(inputId = 'x_coords', label = 'Choose X Coordinate Column', choices = NULL),
+      #helpText('Be sure to select the correct column to use'),
+      #selectInput(inputId = 'y_coords', label = 'Choose Y Coordinate Column', choices = NULL),
+      #helpText('Be sure to select the correct column to use'),
       #numericInput(inputId = 'x_point', label = 'X Value', value = 0),
       #numericInput(inputId = 'y_point', label = 'Y Value', value = 0),
       numericInput(inputId = 'cell_size', label = 'Grid Size (Cell Size)', value = 100, min = 0),
@@ -168,13 +168,13 @@ server <- function(input, output, session) {
                  if (input$example_data == "Simple") {
                    table <- simple_data
                    table <- cbind(data.table('Point ID' = 1:nrow(table)), table)
-                   global_vals$Point_Table <- table
+                   Point_Table <<- table
                  }
                  
                  if (input$example_data == "Complex") {
                    table <- complex_data
                    table <- cbind(data.table('Point ID' = 1:nrow(table)), table)
-                   global_vals$Point_Table <- table
+                   Point_Table <<- table
                  }
                  
                })
@@ -190,7 +190,7 @@ server <- function(input, output, session) {
   # Add Button Pressed
   observeEvent(eventExpr = input$add_button, {
     # Error message if they try to add points to existing file
-    if (nrow(global_vals$Point_Table) > 1) {
+    if (nrow(Point_Table) > 1) {
       showModal(modalDialog(
         "You can not add points to an existing dataset at this time",
         easyClose = T
@@ -201,19 +201,19 @@ server <- function(input, output, session) {
     global_vals$Point_ID = global_vals$Point_ID + 1
     # check if table is created yet, if not create, if so bind new values
     if(global_vals$Point_ID == 1){
-      if (length(global_vals$Point_Table) != 0){
-        global_vals$Point_Table <- rbind(global_vals$Point_Table, data.table('Point ID' = global_vals$Point_ID, 'X ' = input$x_point, 'Y' = input$y_point))
+      if (length(Point_Table) != 0){
+        Point_Table <<- rbind(Point_Table, data.table('Point ID' = global_vals$Point_ID, 'X ' = input$x_point, 'Y' = input$y_point))
       }else{
-        global_vals$Point_Table <- data.table('Point ID' = global_vals$Point_ID, 'X' = input$x_point, 'Y' = input$y_point)
+        Point_Table <<- data.table('Point ID' = global_vals$Point_ID, 'X' = input$x_point, 'Y' = input$y_point)
       }
     }else{
-      global_vals$Point_Table <- rbind(global_vals$Point_Table, data.table('Point ID' = global_vals$Point_ID, 'X' = input$x_point, 'Y' = input$y_point))
+      Point_Table <<- rbind(Point_Table, data.table('Point ID' = global_vals$Point_ID, 'X' = input$x_point, 'Y' = input$y_point))
     }
     # change the x and y columns to the correct variable name
-    updateSelectInput(session, inputId = 'x_coords', choices = colnames(global_vals$Point_Table), selected = 'X')
-    updateSelectInput(session, inputId = 'y_coords', choices = colnames(global_vals$Point_Table), selected = 'Y')
+    updateSelectInput(session, inputId = 'x_coords', choices = colnames(Point_Table), selected = 'X')
+    updateSelectInput(session, inputId = 'y_coords', choices = colnames(Point_Table), selected = 'Y')
     # plot table
-    output$Point_Table <- DT::renderDataTable(expr = DT::datatable(data = global_vals$Point_Table))
+    output$Point_Table <- DT::renderDataTable(expr = DT::datatable(data = Point_Table))
   })
   
   # Observe if table is active, if so then produce table
@@ -223,14 +223,14 @@ server <- function(input, output, session) {
     table <- fread(input = table$datapath)
     table <- cbind(data.table('Point ID' = 1:nrow(table)), table)
     output$Point_Table <- DT::renderDataTable(expr = DT::datatable(data = table))
-    global_vals$Point_Table <- table
+    Point_Table <<- table
     
     #name_check <- colnames(table)
     #if (any(name_check == 'X') & any(name_check == 'Y')){
     # create table if file is uploaded
     #table <- cbind(data.table('Point ID' = 1:nrow(table)), table)
     #output$Point_Table <- DT::renderDataTable(expr = DT::datatable(data = table))
-    #global_vals$Point_Table <- table
+    #Point_Table <- table
     #}else{
     #validate("Please Upload Table with column names X and Y")
     #}
@@ -239,20 +239,20 @@ server <- function(input, output, session) {
   
   # read in table columns and update column names in inputs
   observe({
-    updateSelectInput(session, inputId = 'x_coords', choices = colnames(global_vals$Point_Table))
-    updateSelectInput(session, inputId = 'y_coords', choices = colnames(global_vals$Point_Table))
+    updateSelectInput(session, inputId = 'x_coords', choices = colnames(Point_Table))
+    updateSelectInput(session, inputId = 'y_coords', choices = colnames(Point_Table))
   })
   
   # If create grid button is clicked produce the graph and grid
   observeEvent(eventExpr = input$run_refinement, ignoreInit = T, ignoreNULL = T,{
-    table_data = as.data.frame(global_vals$Point_Table)
-    x_coord = table_data[,input$x_coords]
-    y_coord = table_data[,input$y_coords]
+    table_data = as.data.frame(Point_Table)
+    x_coord = table_data[,"X"]
+    y_coord = table_data[,"Y"]
     # get grid
     grid_data <- Grid_Refinement_Function(x_coords =  x_coord, y_coords = y_coord, cell_size = input$cell_size, buffer = input$buffer, num_ref = input$num_ref, ref_method = input$ref_method)
     
     # make new table just for points
-    point_table <- data.frame(x_coord,y_coord)
+    point_table <<- data.frame(x_coord,y_coord)
     
     # make graph
     plot <- ggplot() +
