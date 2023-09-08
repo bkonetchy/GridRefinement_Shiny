@@ -5,9 +5,13 @@ library(ggplot2)
 library(data.table)
 
 # read in example datasets
-simple_data <<- read.csv("https://docs.google.com/spreadsheets/d/e/2PACX-1vT5dXhUhLHM93c23pbfnq9k2OApr6ZfV5Gjv1PklX_woOHkSZSDJ_kqMDfaoyxFm4Z5CzltOBeNvO_p/pub?gid=1459563270&single=true&output=csv")
+simple_data <<- data.frame("X" = c(5, 4, 6, 2),
+                           "Y" = c(10, 3, 7, 3))
+#read.csv("https://docs.google.com/spreadsheets/d/e/2PACX-1vT5dXhUhLHM93c23pbfnq9k2OApr6ZfV5Gjv1PklX_woOHkSZSDJ_kqMDfaoyxFm4Z5CzltOBeNvO_p/pub?gid=1459563270&single=true&output=csv")
 
-complex_data <<- read.csv("https://docs.google.com/spreadsheets/d/e/2PACX-1vQIJDP3KqUtMA3xsMrNxgXrNicpX1Pj6lJK3HSdyWbIRNwU2vImSf4DZTA3QV1ArqSFFpYgRox0NLdX/pub?gid=1285731657&single=true&output=csv")
+complex_data <<- data.frame("X" = runif(n = 5, min = 1000, max = 10000),
+                            "Y" = runif(n = 5, min = 1000, max = 10000))
+  #read.csv("https://docs.google.com/spreadsheets/d/e/2PACX-1vQIJDP3KqUtMA3xsMrNxgXrNicpX1Pj6lJK3HSdyWbIRNwU2vImSf4DZTA3QV1ArqSFFpYgRox0NLdX/pub?gid=1285731657&single=true&output=csv")
 
 # Grid Functions
 Make_Grid <- function(x_coords, y_coords, cell_size, buffer){
@@ -160,7 +164,7 @@ server <- function(input, output, session) {
   
   # global vals
   global_vals <- reactiveValues()
-  global_vals$Point_ID = 0
+  Point_ID <<- 0
   
   # load example datasets
   observeEvent(eventExpr = input$example_data, 
@@ -198,16 +202,16 @@ server <- function(input, output, session) {
       return()
     }
     # increase ID number
-    global_vals$Point_ID = global_vals$Point_ID + 1
+    Point_ID = Point_ID + 1
     # check if table is created yet, if not create, if so bind new values
-    if(global_vals$Point_ID == 1){
+    if(Point_ID == 1){
       if (length(Point_Table) != 0){
-        Point_Table <<- rbind(Point_Table, data.table('Point ID' = global_vals$Point_ID, 'X ' = input$x_point, 'Y' = input$y_point))
+        Point_Table <<- rbind(Point_Table, data.table('Point ID' = Point_ID, 'X ' = input$x_point, 'Y' = input$y_point))
       }else{
-        Point_Table <<- data.table('Point ID' = global_vals$Point_ID, 'X' = input$x_point, 'Y' = input$y_point)
+        Point_Table <<- data.table('Point ID' = Point_ID, 'X' = input$x_point, 'Y' = input$y_point)
       }
     }else{
-      Point_Table <<- rbind(Point_Table, data.table('Point ID' = global_vals$Point_ID, 'X' = input$x_point, 'Y' = input$y_point))
+      Point_Table <<- rbind(Point_Table, data.table('Point ID' = Point_ID, 'X' = input$x_point, 'Y' = input$y_point))
     }
     # change the x and y columns to the correct variable name
     updateSelectInput(session, inputId = 'x_coords', choices = colnames(Point_Table), selected = 'X')
