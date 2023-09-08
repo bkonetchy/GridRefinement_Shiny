@@ -12,6 +12,7 @@ simple_data <<- data.frame("X" = c(5, 4, 6, 2),
 complex_data <<- data.frame("X" = runif(n = 5, min = 1000, max = 10000),
                             "Y" = runif(n = 5, min = 1000, max = 10000))
   #read.csv("https://docs.google.com/spreadsheets/d/e/2PACX-1vQIJDP3KqUtMA3xsMrNxgXrNicpX1Pj6lJK3HSdyWbIRNwU2vImSf4DZTA3QV1ArqSFFpYgRox0NLdX/pub?gid=1285731657&single=true&output=csv")
+Point_ID <<- 0
 
 # Grid Functions
 Make_Grid <- function(x_coords, y_coords, cell_size, buffer){
@@ -161,10 +162,6 @@ ui <- fluidPage(
 
 # server section
 server <- function(input, output, session) {
-  
-  # global vals
-  global_vals <- reactiveValues()
-  Point_ID <<- 0
   
   # load example datasets
   observeEvent(eventExpr = input$example_data, 
