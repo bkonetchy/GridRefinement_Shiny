@@ -2,6 +2,7 @@
 
 library(shiny)
 library(data.table)
+library(ggplot2)
 
 # read in example datasets
 simple_data <<- data.frame("X" = c(5, 4, 6, 2),
@@ -9,6 +10,8 @@ simple_data <<- data.frame("X" = c(5, 4, 6, 2),
 
 complex_data <<- data.frame("X" = runif(n = 5, min = 1000, max = 10000),
                             "Y" = runif(n = 5, min = 1000, max = 10000))
+
+Point_ID <<- 0
 
 # Grid Functions
 Make_Grid <- function(x_coords, y_coords, cell_size, buffer){
@@ -149,11 +152,56 @@ ui <- fluidPage(
 )
 
 # Define server logic required to draw a histogram
-server <- function(input, output) {
-
+server <- function(input, output, session) {
+  
+  # load example datasets
+  observeEvent(eventExpr = input$example_data, 
+               handlerExpr = {
+                 if (input$example_data == "Simple") {
+                   table <- simple_data
+                   table <- cbind(data.table('Point ID' = 1:nrow(table)), table)
+                   Point_Table <<- table
+                 }
+                 
+                 if (input$example_data == "Complex") {
+                   table <- complex_data
+                   table <- cbind(data.table('Point ID' = 1:nrow(table)), table)
+                   Point_Table <<- table
+                 }
+                 
+               })
+  
+  # If create grid button is clicked produce the graph and grid
+  observeEvent(eventExpr = input$run_refinement, ignoreInit = T, ignoreNULL = T,{
+    table_data = as.data.frame(Point_Table)
+    x_coord = table_data[,"X"]
+    y_coord = table_data[,"Y"]
+    # get grid
+    grid_data <<- Grid_Refinement_Function(x_coords =  x_coord, y_coords = y_coord, cell_size = input$cell_size, buffer = input$buffer, num_ref = input$num_ref, ref_method = input$ref_method)
+    
+    # make new table just for points
+    point_table <- data.frame(x_coord,y_coord)
+    
+    
+    # output$Point_Graph <- renderPlot({
+    #   plot(point_table)
+    # })
+    
+    # make graph
     output$Point_Graph <- renderPlot({
-      plot(simple_data)
+      ggplot() +
+        geom_point(data = point_table, aes(x = x_coord, y = y_coord), color = 'steelblue', size = 4) +
+        geom_rect(data = grid_data, aes(xmin = x - cell_size/2, ymin = y - cell_size/2, 
+                                        xmax = x + cell_size/2, ymax = y + cell_size/2), 
+                  color = 'black', fill = NA) +
+        labs(x = 'X', y = 'Y') +
+        theme(axis.text = element_text(size = 12), axis.title = element_text(size = 14), 
+              title = element_text(size = 14), legend.text = element_text(size = 12))
     })
+    
+  })
+
+    
 }
 
 # Run the application 
