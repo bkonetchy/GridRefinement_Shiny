@@ -168,14 +168,12 @@ server <- function(input, output, session) {
                  if (input$example_data == "Simple") {
                    table <- simple_data
                    table <- cbind(data.table('Point ID' = 1:nrow(table)), table)
-                   output$Point_Table <- DT::renderDataTable(expr = DT::datatable(data = table))
                    global_vals$Point_Table <- table
                  }
                  
                  if (input$example_data == "Complex") {
                    table <- complex_data
                    table <- cbind(data.table('Point ID' = 1:nrow(table)), table)
-                   output$Point_Table <- DT::renderDataTable(expr = DT::datatable(data = table))
                    global_vals$Point_Table <- table
                  }
                  
