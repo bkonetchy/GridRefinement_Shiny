@@ -119,7 +119,10 @@ ui <- fluidPage(
     # Sidebar panel for inputs ----
     sidebarPanel(
       
-      fileInput(inputId = 'point_file', label = 'Select CSV File to Load'),
+      fileInput(inputId = 'point_file', label = 'Select CSV File to Load', 
+                accept = c("text/csv", "text/comma-separated-values, .csv")),
+      selectInput(inputId = "example_data", label = "Select Example Dataset", 
+                  choices = c("Simple", "Complex")),
       selectInput(inputId = 'x_coords', label = 'Choose X Coordinate Column', choices = NULL),
       helpText('Be sure to select the correct column to use'),
       selectInput(inputId = 'y_coords', label = 'Choose Y Coordinate Column', choices = NULL),
@@ -131,7 +134,7 @@ ui <- fluidPage(
       numericInput(inputId = 'num_ref', label = 'Number of Grid Refinments', value = 0, min = 0),
       selectInput(inputId = 'ref_method', label = 'Grid Refinement Method', choices = c('Single', 'Radial')),
       helpText('Single refines the grid at the piont location/Radial refines at the point and the surrounding cells'),
-      actionButton(inputId = 'add_button', label = 'Add Points'),
+      #actionButton(inputId = 'add_button', label = 'Add Points'),
       actionButton(inputId = 'run_refinement', label = 'Create Grid'),
       actionButton(inputId = 'help_button', label = 'Help')
       
@@ -153,6 +156,25 @@ server <- function(input, output, session) {
   # global vals
   global_vals <- reactiveValues()
   global_vals$Point_ID = 0
+  
+  # load example datasets
+  observeEvent(eventExpr = input$example_data, 
+               handlerExpr = {
+                 if (input$example_data == "Simple") {
+                   table <- fread("https://docs.google.com/spreadsheets/d/e/2PACX-1vT5dXhUhLHM93c23pbfnq9k2OApr6ZfV5Gjv1PklX_woOHkSZSDJ_kqMDfaoyxFm4Z5CzltOBeNvO_p/pub?gid=1459563270&single=true&output=csv")
+                   table <- cbind(data.table('Point ID' = 1:nrow(table)), table)
+                   output$Point_Table <- DT::renderDataTable(expr = DT::datatable(data = table))
+                   global_vals$Point_Table <- table
+                 }
+                 
+                 if (input$example_data == "Complex") {
+                   table <- fread("https://docs.google.com/spreadsheets/d/e/2PACX-1vQIJDP3KqUtMA3xsMrNxgXrNicpX1Pj6lJK3HSdyWbIRNwU2vImSf4DZTA3QV1ArqSFFpYgRox0NLdX/pub?gid=1285731657&single=true&output=csv")
+                   table <- cbind(data.table('Point ID' = 1:nrow(table)), table)
+                   output$Point_Table <- DT::renderDataTable(expr = DT::datatable(data = table))
+                   global_vals$Point_Table <- table
+                 }
+                 
+               })
   
   # Help Button Pressed
   observeEvent(eventExpr = input$help_button, {
