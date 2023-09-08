@@ -248,7 +248,7 @@ server <- function(input, output, session) {
   })
   
   # If create grid button is clicked produce the graph and grid
-  observeEvent(eventExpr = input$run_refinement, ignoreInit = T, ignoreNULL = T,{
+  observeEvent(eventExpr = input$ref_method, ignoreInit = T, ignoreNULL = T,{
     plot <- ggplot() +
       geom_point(data = simple_data, aes(x = X, y = Y))
     output$Point_Graph <- renderPlot(plot)
