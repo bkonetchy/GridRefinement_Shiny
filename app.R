@@ -151,7 +151,7 @@ ui <- fluidPage(
 # Define server logic required to draw a histogram
 server <- function(input, output) {
 
-    output$distPlot <- renderPlot({
+    output$Point_Graph <- renderPlot({
       plot(simple_data)
     })
 }
