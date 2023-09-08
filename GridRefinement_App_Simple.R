@@ -119,8 +119,8 @@ ui <- fluidPage(
     # Sidebar panel for inputs ----
     sidebarPanel(
       
-      fileInput(inputId = 'point_file', label = 'Select CSV File to Load', 
-                accept = c("text/csv", "text/comma-separated-values, .csv")),
+      #fileInput(inputId = 'point_file', label = 'Select CSV File to Load', 
+                #accept = c("text/csv", "text/comma-separated-values, .csv")),
       selectInput(inputId = "example_data", label = "Select Example Dataset", 
                   choices = c("Simple", "Complex")),
       selectInput(inputId = 'x_coords', label = 'Choose X Coordinate Column', choices = NULL),
@@ -136,7 +136,7 @@ ui <- fluidPage(
       helpText('Single refines the grid at the piont location/Radial refines at the point and the surrounding cells'),
       #actionButton(inputId = 'add_button', label = 'Add Points'),
       actionButton(inputId = 'run_refinement', label = 'Create Grid'),
-      actionButton(inputId = 'help_button', label = 'Help')
+      #actionButton(inputId = 'help_button', label = 'Help')
       
     ),
     
