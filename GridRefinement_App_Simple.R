@@ -4,6 +4,11 @@ library(shiny)
 library(ggplot2)
 library(data.table)
 
+# read in example datasets
+simple_data <<- fread("https://docs.google.com/spreadsheets/d/e/2PACX-1vT5dXhUhLHM93c23pbfnq9k2OApr6ZfV5Gjv1PklX_woOHkSZSDJ_kqMDfaoyxFm4Z5CzltOBeNvO_p/pub?gid=1459563270&single=true&output=csv")
+
+complex_data <<- fread("https://docs.google.com/spreadsheets/d/e/2PACX-1vQIJDP3KqUtMA3xsMrNxgXrNicpX1Pj6lJK3HSdyWbIRNwU2vImSf4DZTA3QV1ArqSFFpYgRox0NLdX/pub?gid=1285731657&single=true&output=csv")
+
 # Grid Functions
 Make_Grid <- function(x_coords, y_coords, cell_size, buffer){
   #check for same length in x and y 
@@ -161,14 +166,14 @@ server <- function(input, output, session) {
   observeEvent(eventExpr = input$example_data, 
                handlerExpr = {
                  if (input$example_data == "Simple") {
-                   table <- fread("https://docs.google.com/spreadsheets/d/e/2PACX-1vT5dXhUhLHM93c23pbfnq9k2OApr6ZfV5Gjv1PklX_woOHkSZSDJ_kqMDfaoyxFm4Z5CzltOBeNvO_p/pub?gid=1459563270&single=true&output=csv")
+                   table <- simple_data
                    table <- cbind(data.table('Point ID' = 1:nrow(table)), table)
                    output$Point_Table <- DT::renderDataTable(expr = DT::datatable(data = table))
                    global_vals$Point_Table <- table
                  }
                  
                  if (input$example_data == "Complex") {
-                   table <- fread("https://docs.google.com/spreadsheets/d/e/2PACX-1vQIJDP3KqUtMA3xsMrNxgXrNicpX1Pj6lJK3HSdyWbIRNwU2vImSf4DZTA3QV1ArqSFFpYgRox0NLdX/pub?gid=1285731657&single=true&output=csv")
+                   table <- complex_data
                    table <- cbind(data.table('Point ID' = 1:nrow(table)), table)
                    output$Point_Table <- DT::renderDataTable(expr = DT::datatable(data = table))
                    global_vals$Point_Table <- table
