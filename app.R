@@ -3,6 +3,7 @@
 library(shiny)
 library(data.table)
 library(ggplot2)
+library(plotly)
 
 # read in example datasets
 simple_data <<- data.frame("X" = c(5, 4, 6, 2),
@@ -145,7 +146,7 @@ ui <- fluidPage(
     mainPanel(
       
       # Output: grid graph
-      plotOutput(outputId = 'Point_Graph', height = 1000, width = '100%')
+      plotlyOutput(outputId = 'Point_Graph', height = 1000, width = '100%')
       
     )
   )
@@ -188,8 +189,8 @@ server <- function(input, output, session) {
     # })
     
     # make graph
-    output$Point_Graph <- renderPlot({
-      ggplot() +
+    output$Point_Graph <- renderPlotly({
+      plot <- ggplot() +
         geom_point(data = point_table, aes(x = x_coord, y = y_coord), color = 'steelblue', size = 4) +
         geom_rect(data = grid_data, aes(xmin = x - cell_size/2, ymin = y - cell_size/2, 
                                         xmax = x + cell_size/2, ymax = y + cell_size/2), 
@@ -197,6 +198,9 @@ server <- function(input, output, session) {
         labs(x = 'X', y = 'Y') +
         theme(axis.text = element_text(size = 12), axis.title = element_text(size = 14), 
               title = element_text(size = 14), legend.text = element_text(size = 12))
+      
+      plotly::ggplotly(plot)
+      
     })
     
   })
