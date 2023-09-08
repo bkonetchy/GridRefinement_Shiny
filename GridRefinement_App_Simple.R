@@ -5,9 +5,9 @@ library(ggplot2)
 library(data.table)
 
 # read in example datasets
-simple_data <<- fread("https://docs.google.com/spreadsheets/d/e/2PACX-1vT5dXhUhLHM93c23pbfnq9k2OApr6ZfV5Gjv1PklX_woOHkSZSDJ_kqMDfaoyxFm4Z5CzltOBeNvO_p/pub?gid=1459563270&single=true&output=csv")
+simple_data <<- read.csv("https://docs.google.com/spreadsheets/d/e/2PACX-1vT5dXhUhLHM93c23pbfnq9k2OApr6ZfV5Gjv1PklX_woOHkSZSDJ_kqMDfaoyxFm4Z5CzltOBeNvO_p/pub?gid=1459563270&single=true&output=csv")
 
-complex_data <<- fread("https://docs.google.com/spreadsheets/d/e/2PACX-1vQIJDP3KqUtMA3xsMrNxgXrNicpX1Pj6lJK3HSdyWbIRNwU2vImSf4DZTA3QV1ArqSFFpYgRox0NLdX/pub?gid=1285731657&single=true&output=csv")
+complex_data <<- read.csv("https://docs.google.com/spreadsheets/d/e/2PACX-1vQIJDP3KqUtMA3xsMrNxgXrNicpX1Pj6lJK3HSdyWbIRNwU2vImSf4DZTA3QV1ArqSFFpYgRox0NLdX/pub?gid=1285731657&single=true&output=csv")
 
 # Grid Functions
 Make_Grid <- function(x_coords, y_coords, cell_size, buffer){
