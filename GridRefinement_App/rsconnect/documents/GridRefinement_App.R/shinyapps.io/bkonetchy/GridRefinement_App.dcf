@@ -5,7 +5,7 @@ account: bkonetchy
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 9819155
-bundleId: 7666397
+bundleId: 7666410
 url: https://bkonetchy.shinyapps.io/GridRefinement_App/
 version: 1
 asMultiple: FALSE
