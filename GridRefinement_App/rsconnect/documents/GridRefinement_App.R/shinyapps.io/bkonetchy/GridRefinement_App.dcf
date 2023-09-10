@@ -1,0 +1,13 @@
+name: GridRefinement_App
+title: GridRefinement_App
+username: bkonetchy
+account: bkonetchy
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 9819155
+bundleId: 7666397
+url: https://bkonetchy.shinyapps.io/GridRefinement_App/
+version: 1
+asMultiple: FALSE
+asStatic: FALSE
+ignoredFiles: Help_Text.Rmd
