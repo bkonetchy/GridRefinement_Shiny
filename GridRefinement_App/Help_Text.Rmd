@@ -47,8 +47,7 @@ This is the number of refinements desired for each point.  Each additional refin
 This variable has two methods to refine each cell.  The first is the single method in which only at the point location will the cell be refined.  The second is radial in which at the point location and the surrounding 9 cells will be refined.  The second method is used when it is desired to have a step down in cell size at and around the point.  This leads to a more gradual change in cell size.
 
 ### Buttons
-The three buttons are all self explanatory.<br/>
-Create Grid - creates the grid
+Create Grid - creates the grid <br/>
 Help - shows the current document
 
 
