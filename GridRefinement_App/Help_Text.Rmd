@@ -1,0 +1,56 @@
+---
+title: "Help Document"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Help Document
+This text is to guide user through the Grid Refinement App.  It will give a basic overview of the functionality and what the different data entry boxes do along with current limitations or issues with the app.
+
+### How to Use the App
+
+1. Add in data by loading a file.
+2. Select variables desired for grid creation
+    + Cell Size
+    + Buffer
+    + Number of Refinements
+3. Select Create Grid button to produce the grid below
+
+### General Notes
+The app was developed for two basic data entry methods.  The first is the browse to an existing csv file that contains at least columns for the x and y locations of each data point.  The second method is to start adding points manually by adding in the x and y coordinates by hand and then clicking the add points button.  Currently these two methods cannot work together, as in you cannot add an existing data set and then add additional points, or manually add points and then load an existing file.  Warnings will be shown if either scenario is encountered.
+
+If there is an issue with the app or it freezes then reset the browser and try again.  Generally this will fix the issue.
+
+When selecting cell size, always go with a much larger cell size to start with and then work down.  If the cell size is very small over a large area then the app may not be able to handle that many cells.  Also remember the point of the refinement is to work around this issue by only refining around the area of interest, so a small initial cell size would not make much sense if that is required.
+
+## Variable Information {.tabset}
+### Select CSV File to Load
+Allows for the user to choose a file from their computer to load into the app.  The file only needs to contain the x and y coordinates of the point data, but can contain as much additional columns as desired.
+
+### Choose X and Y Coordinate Columns
+Allows user to select which column represents the X and Y coordinate columns from the loaded dataset.<br/>
+**Warning** Be sure to select the correct columns to use or the graph and grid will not display correctly. 
+
+### Cell Size
+This is the size of a single cell.  All cells are assumed square and the cell size represents the length of one side.  This is the base cell size to make the initial grid and will be the largest cell size. 
+
+### Buffer
+This is how many additional columns and rows are desired around the main grid.  For each additional value entered the grid will grow by one additional column to the left and right, and one additional row above and below the main grid.  This is to simply add more room around the main grid and is generally used for aesthetic reasons or if a value outside the main grid are is required.
+
+### Number of Refinements
+This is the number of refinements desired for each point.  Each additional refinement will split the cell area by a fourth (cell area/4) and the cell size will be split in half (cell size/2).  
+
+### Refinement Method
+This variable has two methods to refine each cell.  The first is the single method in which only at the point location will the cell be refined.  The second is radial in which at the point location and the surrounding 9 cells will be refined.  The second method is used when it is desired to have a step down in cell size at and around the point.  This leads to a more gradual change in cell size.
+
+### Buttons
+The three buttons are all self explanatory.<br/>
+Create Grid - creates the grid
+Help - shows the current document
+
+
+
+
