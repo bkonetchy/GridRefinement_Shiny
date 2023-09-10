@@ -7,9 +7,7 @@ library(data.table)
 
 # TODO: Add polygon shapefile export
 #st_make_grid(x = st_as_sf(x = grid, coords = c('x','y')), cellsize = 1)
-# TODO: Add functions to Github, and set up folder to connect for pulling and pushing
 # TODO: Change Ghost Nodes to use Cell Centers and Note the actual point location
-# TODO: In github make readMe.rmd that explains what the functions do, and also use same readMe as post 1 for grid refinment on website. 
 # TODO: Add in error calls, make functions ready for distribution better or to package.
 
 # Grid Functions
@@ -233,22 +231,29 @@ server <- function(input, output, session) {
     
     # If create grid button is clicked produce the graph and grid
     observeEvent(eventExpr = input$run_refinement, ignoreInit = T, ignoreNULL = T,{
+      withProgress(message = "Creating Grid", value = 0, {
+        incProgress(0.2)
         table_data = as.data.frame(global_vals$Point_Table)
         x_coord = table_data[,input$x_coords]
         y_coord = table_data[,input$y_coords]
+        incProgress(0.2)
         # get grid
         grid_data <- Grid_Refinement_Function(x_coords =  x_coord, y_coords = y_coord, cell_size = input$cell_size, buffer = input$buffer, num_ref = input$num_ref, ref_method = input$ref_method)
-        
+        incProgress(0.2)
         # make new table just for points
         point_table <- data.frame(x_coord,y_coord)
         
+        incProgress(0.2)
         # make graph
         plot <- ggplot() +
-            geom_point(data = point_table, aes(x = x_coord, y = y_coord), color = 'steelblue', size = 4) +
-        geom_rect(data = grid_data, aes(xmin = x - cell_size/2, ymin = y - cell_size/2, xmax = x + cell_size/2, ymax = y + cell_size/2), color = 'black', fill = NA) +
+          geom_point(data = point_table, aes(x = x_coord, y = y_coord), color = 'steelblue', size = 4) +
+          geom_rect(data = grid_data, aes(xmin = x - cell_size/2, ymin = y - cell_size/2, xmax = x + cell_size/2, ymax = y + cell_size/2), color = 'black', fill = NA) +
           labs(x = 'X', y = 'Y') +
           theme(axis.text = element_text(size = 12), axis.title = element_text(size = 14), title = element_text(size = 14), legend.text = element_text(size = 12))
         output$Point_Graph <- renderPlot(expr = plot)
+        incProgress(0.2)
+      })
+        
             
     })
     
