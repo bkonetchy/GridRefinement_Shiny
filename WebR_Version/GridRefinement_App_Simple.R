@@ -118,6 +118,24 @@ Grid_Refinement_Function <- function(x_coords, y_coords, cell_size, buffer, num_
   temp_grid
 }
 
+Base_R_Lines <- function(grid_value) {
+  
+  # find all coordinates
+  x1_3 <- grid_value$x - grid_value$cell_size/2
+  x2_4 <- grid_value$x + grid_value$cell_size/2
+  
+  y1_2 <- grid_value$y + grid_value$cell_size/2
+  y3_4 <- grid_value$y - grid_value$cell_size/2
+  
+  # make rect vectors
+  x_vect <- c(x1_3,x2_4,x2_4,x1_3,x1_3)
+  y_vect <- c(y1_2,y1_2,y3_4,y3_4,y1_2)
+  
+  # return as dataframe
+  return(data.frame(x = x_vect, y = y_vect))
+}
+
+
 ui <- fluidPage(
   
   # App title ----
@@ -246,26 +264,43 @@ server <- function(input, output, session) {
   
   # If create grid button is clicked produce the graph and grid
   observeEvent(eventExpr = input$run_refinement, ignoreInit = T, ignoreNULL = T,{
-    table_data = as.data.frame(Point_Table)
-    x_coord = table_data[,"X"]
-    y_coord = table_data[,"Y"]
-    # get grid
-    grid_data <- Grid_Refinement_Function(x_coords =  x_coord, y_coords = y_coord, cell_size = input$cell_size, buffer = input$buffer, num_ref = input$num_ref, ref_method = input$ref_method)
-
-    # make new table just for points
-    point_table <- data.frame(x_coord,y_coord)
-
-    # make graph
-    plot <- ggplot() +
-      geom_point(data = point_table, aes(x = x_coord, y = y_coord), color = 'steelblue', size = 4) +
-      geom_rect(data = grid_data, aes(xmin = x - cell_size/2, ymin = y - cell_size/2, xmax = x + cell_size/2, ymax = y + cell_size/2), color = 'black', fill = NA) +
-      labs(x = 'X', y = 'Y') +
-      theme(axis.text = element_text(size = 12), axis.title = element_text(size = 14), title = element_text(size = 14), legend.text = element_text(size = 12))
-    output$Point_Graph <- renderPlot(expr = plot)
-
-    print('finished')
-  })
+    withProgress(message = "Creating Grid", value = 0, {
+      incProgress(0.2)
+      table_data = as.data.frame(Point_Table)
+      x_coord = table_data[,"X"]
+      y_coord = table_data[,"Y"]
+      incProgress(0.2)
+      # get grid
+      grid_data <<- Grid_Refinement_Function(x_coords =  x_coord, y_coords = y_coord, 
+                                             cell_size = input$cell_size, 
+                                             buffer = input$buffer, 
+                                             num_ref = input$num_ref, ref_method = input$ref_method)
+    
+      incProgress(0.2)
+      # make base R rect dataset
+      baseR_rects <- lapply(1:nrow(grid_data), FUN = function(x) Base_R_Lines(grid_value = grid_data[x]))
   
+      # make new table just for points
+      point_table <<- data.frame(x_coord,y_coord)
+      incProgress(0.2)
+    
+      # render graph
+      output$Point_Graph <- renderPlot(expr = {
+        plot(point_table, 
+             xlim = c(min(grid_data$x), max(grid_data$x)), 
+             ylim = c(min(grid_data$y), max(grid_data$y)),
+             col = "steelblue",
+             pch = 16,
+             cex = 2
+             )
+        lapply(baseR_rects, FUN = function(x) {
+          
+          lines(x$x, x$y)
+        })
+        incProgress(0.2)
+      })
+    })
+  }) 
 }
 
 # Run the application 
